@@ -1,0 +1,110 @@
+/* ===== SIDEBAR CONTAINER ===== */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 260px;
+  height: 100vh;
+  background: #ffffff;
+  padding: 20px 16px;
+  border-right: 1px solid #e5e7eb;
+}
+
+/* ===== TOP SIDE NAV (LOGO AREA) ===== */
+.sidebar h3 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+
+  margin-bottom: 32px;
+}
+
+/* Blue rounded icon BEFORE HH IMS text */
+.sidebar h3::before {
+  content: "∿"; /* simple pulse-style icon */
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #2563eb;
+  color: white;
+
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* ===== LINKS ===== */
+.sidebar a,
+.dropdown-btn {
+  display: block;
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+
+  border-radius: 12px;
+  background: none;
+  border: none;
+
+  text-align: left;
+  text-decoration: none;
+
+  font-size: 15px;
+  font-weight: 500;
+  color: #374151;
+
+  cursor: pointer;
+}
+
+/* Hover */
+.sidebar a:hover,
+.dropdown-btn:hover {
+  background: #f1f5ff;
+  color: #2563eb;
+}
+
+/* Active dashboard (first link only) */
+.sidebar a:first-of-type {
+  background: #eef4ff;
+  color: #2563eb;
+}
+
+/* ===== DROPDOWNS ===== */
+.dropdown-container {
+  display: none;
+  margin-bottom: 8px;
+}
+
+.dropdown-container a {
+  padding-left: 36px;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+/* ===== CONTENT OFFSET ===== */
+.content {
+  margin-left: 260px;
+  padding: 24px;
+}
+
+/* ONLY active page */
+.sidebar a.nav-link.active {
+  background-color: #e0f2fe;
+  color: #2563eb;
+  font-weight: 600;
+  border-radius: 8px;
+}
+
+/* NORMAL links (NO background) */
+.sidebar a.nav-link {
+  background: transparent;
+}
+
+

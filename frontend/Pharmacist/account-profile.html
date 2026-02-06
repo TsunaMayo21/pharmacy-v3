@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Profile</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Existing layout CSS -->
+  <link rel="stylesheet" href="../style.css">
+
+  <style>
+    .profile-card {
+      background: #ffffff;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+      max-width: 900px;
+    }
+
+    .profile-header {
+      background: linear-gradient(135deg, #3b82f6, #4f46e5);
+      height: 140px;
+      position: relative;
+    }
+
+    .avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: #f1f5f9;
+      border: 4px solid #ffffff;
+      position: absolute;
+      bottom: -45px;
+      left: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    .profile-body {
+      padding: 70px 40px 40px;
+    }
+
+    .label-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: #e0f2fe;
+      color: #0369a1;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #2563eb;
+    }
+
+    /* Password strength */
+    .strength-text {
+      font-size: 13px;
+      margin-top: 6px;
+      font-weight: 500;
+    }
+
+    .strength-weak { color: #dc2626; }
+    .strength-medium { color: #d97706; }
+    .strength-strong { color: #16a34a; }
+  </style>
+</head>
+<body>
+
+<!-- ============ SIDEBAR (UNCHANGED) ============ -->
+<div class="sidebar">
+  <h3>HH IMS</h3>
+
+<a href="dashboard.html" class="nav-link">Dashboard</a>
+
+<button class="dropdown-btn">Account ▾</button>
+<div class="dropdown-container">
+  <a href="account-profile.html" class="nav-link">My Profile</a>
+</div>
+
+<button class="dropdown-btn">Products ▾</button>
+<div class="dropdown-container">
+  <a href="add-product.html" class="nav-link">Add Product</a>
+  <a href="product-list.php" class="nav-link">Product List</a>
+</div>
+
+<button class="dropdown-btn">Reports ▾</button>
+<div class="dropdown-container">
+  <a href="report-view.html" class="nav-link">View Report</a>
+</div>
+
+  <a href="../../backend/logout.php" class="btn btn-danger">Logout</a>
+</div>
+<!-- ============ END SIDEBAR ============ -->
+
+
+<!-- ============ CONTENT ============ -->
+<div class="content d-flex justify-content-center pt-4">
+  <div class="profile-card w-100">
+    <div class="profile-header">
+      <div class="avatar" id="profileAvatar">A</div>
+    </div>
+
+    <div class="profile-body">
+      <h4 class="fw-bold mb-4">My Profile</h4>
+
+      <form action="../../backend/Pharmacist/update_profile_action.php" method="POST" onsubmit="return updateProfile(event)">
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <div class="label-title">Full Name</div>
+            <input type="text" name="name" id="name" class="form-control" required>
+          </div>
+
+          <div class="col-md-6">
+            <div class="label-title">Username</div>
+            <input type="text" name="username" id="username" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <div class="label-title">Email</div>
+            <input type="email" name="email" id="email" class="form-control" required>
+          </div>
+
+          <div class="col-md-6">
+            <div class="label-title">Phone Number</div>
+            <input type="text" name="phoneNum" id="phoneNum" class="form-control" placeholder="e.g. 0123456789">
+          </div>
+        </div>
+
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <div class="label-title">Password (Leave blank to keep current)</div>
+            <div class="input-group">
+              <input type="password" name="password" id="password" class="form-control" placeholder="New password" oninput="checkStrength()">
+              <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()">
+                <i class="bi bi-eye" id="eyeIcon"></i>
+              </button>
+            </div>
+            <div id="strengthText" class="strength-text"></div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="label-title">Role</div>
+            <input type="text" id="profileRole" class="form-control" disabled>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <div class="label-title">Account Status</div>
+          <span class="status-badge" id="statusBadge">
+             </span>
+        </div>
+
+        <div class="text-end">
+          <button type="submit" class="btn btn-primary px-4">Update Profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- ============ END CONTENT ============ -->
+
+
+<script>
+function togglePassword() {
+  const pwd = document.getElementById("password");
+  const eye = document.getElementById("eyeIcon");
+
+  if (pwd.type === "password") {
+    pwd.type = "text";
+    eye.className = "bi bi-eye-slash";
+  } else {
+    pwd.type = "password";
+    eye.className = "bi bi-eye";
+  }
+}
+
+function checkStrength() {
+  const pwd = document.getElementById("password").value;
+  const strengthText = document.getElementById("strengthText");
+
+  if (pwd.length === 0) {
+    strengthText.textContent = "";
+    return;
+  }
+
+  if (pwd.length < 6) {
+    strengthText.textContent = "Weak password";
+    strengthText.className = "strength-text strength-weak";
+  } else if (pwd.match(/[A-Z]/) && pwd.match(/[0-9]/)) {
+    strengthText.textContent = "Strong password";
+    strengthText.className = "strength-text strength-strong";
+  } else {
+    strengthText.textContent = "Medium password";
+    strengthText.className = "strength-text strength-medium";
+  }
+}
+
+document.querySelectorAll(".dropdown-btn").forEach(btn => {
+  btn.onclick = () => {
+    const menu = btn.nextElementSibling;
+    menu.style.display =
+      menu.style.display === "block" ? "none" : "block";
+  };
+});
+
+//fetch data from database
+document.addEventListener("DOMContentLoaded", function() {
+    fetch('../../backend/Pharmacist/get_profile.php')
+        .then(response => response.json())
+        .then(data => {
+            if(!data.error) {
+                // FIXED: Removing 'profile' prefix to match your HTML IDs
+                document.getElementById('name').value = data.name || "";
+                document.getElementById('username').value = data.username || "";
+                document.getElementById('email').value = data.email || "";
+                document.getElementById('phoneNum').value = data.phoneNum || "";
+                document.getElementById('profileRole').value = data.role || "";
+
+                // Update the avatar letter and status badge
+                document.getElementById('profileAvatar').textContent = data.name.charAt(0).toUpperCase();
+                document.getElementById('statusBadge').innerHTML = `<span class="status-dot"></span> ${data.accountStatus}`;
+            }
+        })
+        .catch(err => console.error("Fetch error:", err));
+});
+
+function updateProfile(event) {
+    // Prevent immediate submit to show confirmation
+    event.preventDefault();
+    
+    if (confirm("Are you sure you want to update your profile?")) {
+        // This targets the form element and submits it to your PHP action
+        event.currentTarget.submit();
+    }
+}
+</script>
+
+<script>
+  // get current file name only
+  const currentPage = window.location.pathname.split("/").pop();
+
+  // remove ALL active classes (important)
+  document.querySelectorAll(".sidebar .active").forEach(el => {
+    el.classList.remove("active");
+  });
+
+  // find exact matching link
+  document.querySelectorAll(".sidebar a.nav-link").forEach(link => {
+    const linkPage = link.getAttribute("href");
+
+    if (linkPage === currentPage) {
+      link.classList.add("active");
+
+      // open its dropdown if exists
+      const dropdown = link.closest(".dropdown-container");
+      if (dropdown) {
+        dropdown.style.display = "block";
+      }
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reports</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+
+  <style>
+    .report-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+    }
+
+    .badge-method {
+      background: #f1f5f9;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 13px;
+    }
+
+    .status-ok { color: #16a34a; font-weight: 500; }
+    .status-warn { color: #d97706; font-weight: 500; }
+    .status-bad { color: #dc2626; font-weight: 500; }
+
+    .report-meta {
+      font-size: 14px;
+      color: #475569;
+      margin-bottom: 12px;
+    }
+
+    @media print {
+      .sidebar,
+      .no-print,
+      button,
+      .dropdown-btn {
+        display: none !important;
+      }
+
+      .content {
+        margin: 0;
+        padding: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <h3>HH IMS</h3>
+
+<a href="dashboard.html" class="nav-link">Dashboard</a>
+
+<button class="dropdown-btn">Account ▾</button>
+<div class="dropdown-container">
+  <a href="account-profile.html" class="nav-link">My Profile</a>
+  <a href="account-management.php" class="nav-link">User Management</a>
+</div>
+
+<button class="dropdown-btn">Products ▾</button>
+<div class="dropdown-container">
+  <a href="product-list.php" class="nav-link">Product List</a>
+</div>
+
+<button class="dropdown-btn">Reports ▾</button>
+<div class="dropdown-container">
+  <a href="report-view.html" class="nav-link">View Report</a>
+</div>
+
+  <a href="../../backend/logout.php" class="btn btn-danger">Logout</a>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <h3 class="mb-4">Reports</h3>
+
+  <!-- GENERATE REPORT -->
+  <div class="report-card no-print">
+    <h5 class="fw-bold mb-3">Generate Report</h5>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label class="form-label">Report Type</label>
+        <select class="form-select" id="reportType">
+          <option value="" selected disabled>Please select the report</option>
+          <option value="stock">Inventory Stock Report</option>
+          <option value="expiry">Expiry Report (Expired & Expiring)</option>
+          <option value="disposal">Disposal Report</option>
+          <option value="supplier">Supplier-Based Report</option>
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Start Date (Optional)</label>
+        <input type="date" class="form-control" id="startDate">
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">End Date (Optional)</label>
+        <input type="date" class="form-control" id="endDate">
+      </div>
+    </div>
+
+    <div class="text-end">
+      <button class="btn btn-primary" onclick="generateReport()">
+        <i class="bi bi-file-earmark-text"></i> Generate Report
+      </button>
+    </div>
+  </div>
+
+  <!-- REPORT RESULT -->
+  <div class="report-card d-none" id="reportResult">
+    <h5 class="fw-bold mb-1" id="reportTitle"></h5>
+    <div class="report-meta" id="reportDate"></div>
+
+    <table class="table align-middle" id="reportTable"></table>
+
+    <div class="text-end mt-3 no-print">
+      <button class="btn btn-outline-primary" onclick="printReport()">
+        <i class="bi bi-printer"></i> Print Report
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function generateReport() {
+    const type = document.getElementById("reportType").value;
+    const startDate = document.getElementById("startDate").value;
+    const endDate = document.getElementById("endDate").value;
+    const table = document.getElementById("reportTable");
+    const resultDiv = document.getElementById("reportResult");
+    const title = document.getElementById("reportTitle");
+    const dateMeta = document.getElementById("reportDate"); // Target the div under title
+
+    if (!type) {
+        alert("Please select a report type.");
+        return;
+    }
+
+    // Dynamic Title Update
+    const titles = {
+        stock: "Inventory Stock Report",
+        expiry: "Expiry & Warning Report",
+        disposal: "Disposal & SOP Records",
+        supplier: "Supplier Inventory Report"
+    };
+    title.textContent = titles[type];
+
+    // --- NEW: Display Start & End Date under Title ---
+    let dateText = "";
+    if (startDate && endDate) {
+        dateText = `Report Period: <strong>${startDate}</strong> to <strong>${endDate}</strong>`;
+    } else if (startDate) {
+        dateText = `Report Period: Starting from <strong>${startDate}</strong>`;
+    } else if (endDate) {
+        dateText = `Report Period: Up to <strong>${endDate}</strong>`;
+    } else {
+        dateText = "Generated on: " + new Date().toLocaleDateString('en-GB');
+    }
+    dateMeta.innerHTML = dateText; 
+    // ------------------------------------------------
+
+    fetch(`../../backend/Manager/generate_report.php?type=${type}&startDate=${startDate}&endDate=${endDate}`)
+        .then(response => response.text())
+        .then(data => {
+            if (data.trim() === "") {
+                table.innerHTML = "<tbody><tr><td colspan='6' class='text-center'>No records found for the selected criteria.</td></tr></tbody>";
+            } else {
+                table.innerHTML = data;
+            }
+            resultDiv.classList.remove("d-none");
+        })
+        .catch(err => alert("Error generating report: " + err));
+}
+
+function printReport() {
+  if (confirm("Are you sure you want to print this report?")) {
+    window.print();
+  }
+}
+
+document.querySelectorAll(".dropdown-btn").forEach(btn => {
+  btn.onclick = () => {
+    const menu = btn.nextElementSibling;
+    menu.style.display =
+      menu.style.display === "block" ? "none" : "block";
+  };
+});
+</script>
+
+<script>
+  // get current file name only
+  const currentPage = window.location.pathname.split("/").pop();
+
+  // remove ALL active classes (important)
+  document.querySelectorAll(".sidebar .active").forEach(el => {
+    el.classList.remove("active");
+  });
+
+  // find exact matching link
+  document.querySelectorAll(".sidebar a.nav-link").forEach(link => {
+    const linkPage = link.getAttribute("href");
+
+    if (linkPage === currentPage) {
+      link.classList.add("active");
+
+      // open its dropdown if exists
+      const dropdown = link.closest(".dropdown-container");
+      if (dropdown) {
+        dropdown.style.display = "block";
+      }
+    }
+  });
+</script>
+
+
+
+</body>
+</html>
