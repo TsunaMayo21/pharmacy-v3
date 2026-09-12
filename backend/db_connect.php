@@ -1,4 +1,3 @@
-
 <?php
 $host = getenv('DB_HOST') ?: 'mysql-18a7f917-pharma-hh-ims.b.aivencloud.com';
 $port = getenv('DB_PORT') ?: 27565;
@@ -14,4 +13,3 @@ $conn->real_connect($host, $user, $pass, $db, $port, NULL, MYSQLI_CLIENT_SSL);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-?>
