@@ -22,7 +22,7 @@ if ($type === 'stock') {
     $filter = buildDateFilter("pi.expiryDate", $startDate, $endDate);
     $query = "SELECT p.productName, pi.batchNumber, pi.quantity, pi.expiryDate 
               FROM product p 
-              JOIN productItem pi ON p.productID = pi.productID
+              JOIN productitem pi ON p.productID = pi.productID
               WHERE 1=1 $filter";
     
     $result = mysqli_query($conn, $query);
