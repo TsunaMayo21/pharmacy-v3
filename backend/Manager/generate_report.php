@@ -22,7 +22,7 @@ if ($type === 'stock') {
     $filter = buildDateFilter("pi.expiryDate", $startDate, $endDate);
     $query = "SELECT p.productName, pi.batchNumber, pi.quantity, pi.expiryDate 
               FROM product p 
-              JOIN productItem pi ON p.productID = pi.productID
+              JOIN productitem pi ON p.productID = pi.productID
               WHERE 1=1 $filter";
     
     $result = mysqli_query($conn, $query);
@@ -39,7 +39,7 @@ elseif ($type === 'expiry') {
     $filter = buildDateFilter("pi.expiryDate", $startDate, $endDate);
     $query = "SELECT p.productName, pi.batchNumber, pi.expiryDate, 
               DATEDIFF(pi.expiryDate, CURDATE()) as days_left
-              FROM productItem pi
+              FROM productitem pi
               JOIN product p ON pi.productID = p.productID
               WHERE pi.expiryDate <= DATE_ADD(CURDATE(), INTERVAL 30 DAY) $filter
               ORDER BY pi.expiryDate ASC";
@@ -58,7 +58,7 @@ elseif ($type === 'disposal') {
     $filter = buildDateFilter("d.disposalDate", $startDate, $endDate);
     $query = "SELECT d.disposalDate, p.productName, d.batchNumber, d.method, d.disposalStatus 
               FROM disposalrecord d
-              JOIN productItem pi ON d.batchNumber = pi.batchNumber
+              JOIN productitem pi ON d.batchNumber = pi.batchNumber
               JOIN product p ON pi.productID = p.productID
               WHERE 1=1 $filter
               ORDER BY d.disposalDate DESC";
@@ -76,7 +76,7 @@ elseif ($type === 'supplier') {
     $query = "SELECT s.supplierName, p.productName, pi.batchNumber, pi.quantity 
               FROM supplier s
               JOIN product p ON s.supplierID = p.supplierID
-              JOIN productItem pi ON p.productID = pi.productID
+              JOIN productitem pi ON p.productID = pi.productID
               ORDER BY s.supplierName ASC";
 
     $result = mysqli_query($conn, $query);
